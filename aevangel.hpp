@@ -1,4 +1,4 @@
-#ifndef AEVANGEL_HPP
+#define AEVANGEL_HPP
 #define AEVANGEL_HPP
 
 #pragma region AEVANGEL_INCLUDES
