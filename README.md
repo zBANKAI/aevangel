@@ -1,7 +1,7 @@
 # aevangel++
 
 <div align="center">
-<img src="https://github.com/zBANKAI/aevangel/blob/39eaeb44dd2eba0e2f45ced6030bea5a34e41d15/aevangel.jpeg" width="700px" />
+<img src="https://github.com/zBANKAI/aevangel/blob/39eaeb44dd2eba0e2f45ced6030bea5a34e41d15/aevangel.jpeg" width="600px" />
 </div>
 
 
