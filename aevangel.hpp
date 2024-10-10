@@ -1,277 +1,134 @@
-#define AEVANGEL_HPP
-#define AEVANGEL_HPP
+#define AEVANGEL_HPP  // Definição da guarda de inclusão
+#define AEVANGEL_HPP  // Repetição da guarda de inclusão (desnecessário)
 
-#pragma region AEVANGEL_INCLUDES
-#include <Windows.h>
-#include <functional>
-#include <intrin.h>
-#include <strsafe.h>
-#include <msclr/marshal_cppstd.h>
-#pragma endregion AEVANGEL_INCLUDES
+#pragma region AEVANGEL_INCLUDES  // Início da seção de inclusões
+#include <Windows.h>  // Inclusão das APIs do Windows
+#include <functional>  // Inclusão da biblioteca para std::function
+#include <intrin.h>  // Inclusão para funções intrínsecas
+#include <strsafe.h>  // Inclusão para manipulação segura de strings
+#include <msclr/marshal_cppstd.h>  // Inclusão para interoperabilidade entre C++ e .NET
+#pragma endregion AEVANGEL_INCLUDES  // Fim da seção de inclusões
 
-#pragma region AEVANGEL_WARNINGS
-#pragma warning(disable : 4838)
-#pragma warning(disable : 4309)
-#pragma warning(disable : 4312)
-#pragma warning(disable : 4311)
-#pragma warning(disable : 4302)
-#pragma warning(disable : 4715)
-#pragma endregion AEVANGEL_WARNINGS
+#pragma region AEVANGEL_WARNINGS  // Início da seção de desativação de avisos
+#pragma warning(disable : 4838)  // Desativa aviso sobre conversões de tipo
+#pragma warning(disable : 4309)  // Desativa aviso sobre conversão de tipo de inteiro
+#pragma warning(disable : 4312)  // Desativa aviso sobre conversão de ponteiro
+#pragma warning(disable : 4311)  // Desativa aviso sobre truncamento de ponteiro
+#pragma warning(disable : 4302)  // Desativa aviso sobre conversão de ponteiro em inteiro
+#pragma warning(disable : 4715)  // Desativa aviso sobre retorno em função não void
+#pragma endregion AEVANGEL_WARNINGS  // Fim da seção de desativação de avisos
 
-#ifndef AEVANGEL_NO_FORCEINLINE
-#if defined(_MSC_VER)
-#define AEVANGEL_FORCEINLINE __forceinline
-#elif defined(__GNUC__) && __GNUC__ > 3
-#define AEVANGEL_FORCEINLINE inline __attribute__((__always_inline__))
+#ifndef AEVANGEL_NO_FORCEINLINE  // Verifica se a força de inline não está desativada
+#if defined(_MSC_VER)  // Verifica se o compilador é o MSVC
+#define AEVANGEL_FORCEINLINE __forceinline  // Define força de inline para MSVC
+#elif defined(__GNUC__) && __GNUC__ > 3  // Verifica se o compilador é o GCC
+#define AEVANGEL_FORCEINLINE inline __attribute__((__always_inline__))  // Define força de inline para GCC
 #else
-#define AEVANGEL_FORCEINLINE inline
+#define AEVANGEL_FORCEINLINE inline  // Define inline padrão
 #endif
 #else
-#define AEVANGEL_FORCEINLINE inline
+#define AEVANGEL_FORCEINLINE inline  // Define inline padrão se a força de inline estiver desativada
 #endif
 
-namespace AEVANGEL++
+namespace AEVANGEL++  // Define o namespace AEVANGEL++
 {	
-	namespace typedefs
+	namespace typedefs  // Define um namespace para typedefs
 	{
-		using NtQuerySystemInformationTypedef = NTSTATUS(*)(ULONG, PVOID, ULONG, PULONG);
+		using NtQuerySystemInformationTypedef = NTSTATUS(*)(ULONG, PVOID, ULONG, PULONG);  // Define tipo de função
 
-		typedef struct _SYSTEM_CODEINTEGRITY_INFORMATION
+		typedef struct _SYSTEM_CODEINTEGRITY_INFORMATION  // Estrutura para informações de integridade de código
 		{
-			ULONG Length;
-			ULONG CodeIntegrityOptions;
-		} SYSTEM_CODEINTEGRITY_INFORMATION, *PSYSTEM_CODEINTEGRITY_INFORMATION;
+			ULONG Length;  // Comprimento da estrutura
+			ULONG CodeIntegrityOptions;  // Opções de integridade de código
+		} SYSTEM_CODEINTEGRITY_INFORMATION, *PSYSTEM_CODEINTEGRITY_INFORMATION;  // Define ponteiro para a estrutura
 
-		typedef enum _SYSTEM_INFORMATION_CLASS
+		typedef enum _SYSTEM_INFORMATION_CLASS  // Enum para classes de informações do sistema
 		{
-			SystemBasicInformation = 0,
-			SystemPerformanceInformation = 2,
-			SystemTimeOfDayInformation = 3,
-			SystemProcessInformation = 5,
-			SystemProcessorPerformanceInformation = 8,
-			SystemInterruptInformation = 23,
-			SystemExceptionInformation = 33,
-			SystemRegistryQuotaInformation = 37,
-			SystemLookasideInformation = 45,
-			SystemCodeIntegrityInformation = 103,
-			SystemPolicyInformation = 134,
-		} SYSTEM_INFORMATION_CLASS;
+			SystemBasicInformation = 0,  // Informações básicas do sistema
+			SystemPerformanceInformation = 2,  // Informações de desempenho
+			SystemTimeOfDayInformation = 3,  // Informações de tempo do dia
+			SystemProcessInformation = 5,  // Informações de processo
+			SystemProcessorPerformanceInformation = 8,  // Informações de desempenho do processador
+			SystemInterruptInformation = 23,  // Informações de interrupção
+			SystemExceptionInformation = 33,  // Informações de exceção
+			SystemRegistryQuotaInformation = 37,  // Informações de cota de registro
+			SystemLookasideInformation = 45,  // Informações de lookaside
+			SystemCodeIntegrityInformation = 103,  // Informações de integridade de código
+			SystemPolicyInformation = 134,  // Informações de política
+		} SYSTEM_INFORMATION_CLASS;  // Finaliza a enumeração
 	}
-	namespace utils
+
+	namespace utils  // Define um namespace para utilitários
 	{
-		AEVANGEL_FORCEINLINE const PEB* get_peb() noexcept
+		AEVANGEL_FORCEINLINE const PEB* get_peb() noexcept  // Função para obter o PEB (Process Environment Block)
 		{
-			#if defined(_M_X64) || defined(__amd64__)
-        		return reinterpret_cast<const PEB*>(__readgsqword(0x60));
-			#elif defined(_M_IX86) || defined(__i386__)
-        		return reinterpret_cast<const PEB*>(__readfsdword(0x30));
-			#elif defined(_M_ARM) || defined(__arm__)
-        		return *reinterpret_cast<const PEB**>(_MoveFromCoprocessor(15, 0, 13, 0, 2) + 0x30);
-			#elif defined(_M_ARM64) || defined(__aarch64__)
-       	 		return *reinterpret_cast<const PEB**>(__getReg(18) + 0x60);
-			#elif defined(_M_IA64) || defined(__ia64__)
-        		return *reinterpret_cast<const PEB**>(static_cast<char*>(_rdteb()) + 0x60);
+			#if defined(_M_X64) || defined(__amd64__)  // Verifica se é arquitetura x64
+        		return reinterpret_cast<const PEB*>(__readgsqword(0x60));  // Lê o PEB em x64
+			#elif defined(_M_IX86) || defined(__i386__)  // Verifica se é arquitetura x86
+        		return reinterpret_cast<const PEB*>(__readfsdword(0x30));  // Lê o PEB em x86
+			#elif defined(_M_ARM) || defined(__arm__)  // Verifica se é arquitetura ARM
+        		return *reinterpret_cast<const PEB**>(_MoveFromCoprocessor(15, 0, 13, 0, 2) + 0x30);  // Lê o PEB em ARM
+			#elif defined(_M_ARM64) || defined(__aarch64__)  // Verifica se é arquitetura ARM64
+       	 		return *reinterpret_cast<const PEB**>(__getReg(18) + 0x60);  // Lê o PEB em ARM64
+			#elif defined(_M_IA64) || defined(__ia64__)  // Verifica se é arquitetura IA64
+        		return *reinterpret_cast<const PEB**>(static_cast<char*>(_rdteb()) + 0x60);  // Lê o PEB em IA64
 			#else
-				#error Unsupported platform.
+				#error Unsupported platform.  // Gera erro se a plataforma não for suportada
 			#endif
 		}
 	}
-	namespace security
+
+	namespace security  // Define um namespace para funções de segurança
 	{
-		std::function<void(void)> ProtectionThread = []()
+		std::function<void(void)> ProtectionThread = []()  // Função que implementa uma thread de proteção
 		{
-			while (true) 
+			while (true)  // Loop infinito
 			{
-				BYTE* overflow = reinterpret_cast<BYTE*>("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
-				PostQuitMessage(0);
-				TerminateProcess(GetCurrentProcess(), 0);
-				PostQuitMessage(0);
-				WriteProcessMemory(GetCurrentProcess(), main, overflow, 1024, nullptr);
-				WriteProcessMemory(GetCurrentProcess(), FindWindowA, overflow, 1024, nullptr);
-				WriteProcessMemory(GetCurrentProcess(), memcpy, overflow, 1024, nullptr);
-				WriteProcessMemory(GetCurrentProcess(), OpenProcess, overflow, 1024, nullptr);
-				WriteProcessMemory(GetCurrentProcess(), GetProcAddress, overflow, 1024, nullptr);
-				WriteProcessMemory(GetCurrentProcess(), WriteProcessMemory, overflow, 1024, nullptr);
-				WriteProcessMemory(GetCurrentProcess(), GetAsyncKeyState, overflow, 1024, nullptr);
+				BYTE* overflow = reinterpret_cast<BYTE*>("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");  // Cria um buffer
+				PostQuitMessage(0);  // Envia mensagem para sair
+				TerminateProcess(GetCurrentProcess(), 0);  // Termina o processo atual
+				PostQuitMessage(0);  // Envia mensagem novamente
+				WriteProcessMemory(GetCurrentProcess(), main, overflow, 1024, nullptr);  // Tenta sobrescrever a memória
+				WriteProcessMemory(GetCurrentProcess(), FindWindowA, overflow, 1024, nullptr);  // Tenta sobrescrever a função FindWindowA
+				WriteProcessMemory(GetCurrentProcess(), memcpy, overflow, 1024, nullptr);  // Tenta sobrescrever a função memcpy
+				WriteProcessMemory(GetCurrentProcess(), OpenProcess, overflow, 1024, nullptr);  // Tenta sobrescrever a função OpenProcess
+				WriteProcessMemory(GetCurrentProcess(), GetProcAddress, overflow, 1024, nullptr);  // Tenta sobrescrever a função GetProcAddress
+				WriteProcessMemory(GetCurrentProcess(), WriteProcessMemory, overflow, 1024, nullptr);  // Tenta sobrescrever a função WriteProcessMemory
+				WriteProcessMemory(GetCurrentProcess(), GetAsyncKeyState, overflow, 1024, nullptr);  // Tenta sobrescrever a função GetAsyncKeyState
 			}
 		};
 	
-		std::function<void(void)> find_window = []()
+		std::function<void(void)> find_window = []()  // Função que procura janelas de depuração
 		{
-			if (FindWindowA(nullptr, "IDA v7.0.170914") || FindWindowA(nullptr, "x64dbg") || FindWindowA(nullptr, "Scylla x64 v0.9.8") || FindWindowA(nullptr, "IAT Autosearch"))
+			if (FindWindowA(nullptr, "IDA v7.0.170914") ||  // Verifica se a janela IDA está aberta
+				FindWindowA(nullptr, "x64dbg") ||  // Verifica se a janela x64dbg está aberta
+				FindWindowA(nullptr, "Scylla x64 v0.9.8") ||  // Verifica se a janela Scylla está aberta
+				FindWindowA(nullptr, "IAT Autosearch"))  // Verifica se a janela IAT Autosearch está aberta
 			{
-				ProtectionThread();
+				ProtectionThread();  // Se qualquer janela de depuração for encontrada, ativa a thread de proteção
 			}
 		};
 
-		std::function<void(void)> is_debugger_present = []()
+		std::function<void(void)> is_debugger_present = []()  // Função que verifica se um depurador está presente
 		{
-			auto is_dbg_present = FALSE;
-			if (sDebuggerPresent())
+			auto is_dbg_present = FALSE;  // Inicializa a variável para indicar presença de depurador
+			if (sDebuggerPresent())  // Verifica se a função sDebuggerPresent indica depurador
 			{
-				ProtectionThread();
+				ProtectionThread();  // Ativa a thread de proteção
 			}
-			if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &is_dbg_present))
+			if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &is_dbg_present))  // Verifica se um depurador remoto está presente
 			{
-				if (is_dbg_present)
+				if (is_dbg_present)  // Se um depurador remoto foi detectado
 				{
-					ProtectionThread();
-				}
-		};
-
-		std::function<void(void)> anti_attach = []()
-		{
-			HMODULE h_ntdll = GetModuleHandleA("ntdll.dll");
-			if (!h_ntdll)
-				return;
-
-			FARPROC p_dbg_break_point = GetProcAddress(h_ntdll, "DbgBreakPoint");
-			if (!p_dbg_break_point)
-				return;
-
-			DWORD dw_old_protect;
-			if (!VirtualProtect(p_dbg_break_point, 1, PAGE_EXECUTE_READWRITE, &dw_old_protect))
-			return;
-
-			*reinterpret_cast<PBYTE>(p_dbg_break_point) = static_cast<BYTE>(0xC3); // 0xC3 == RET
-		};
-	
-		std::function<void(void)> is_memory_traversed = []()
-		{
-			const auto m = VirtualAlloc(nullptr, 4096, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-
-			PSAPI_WORKING_SET_EX_INFORMATION set;
-			set.VirtualAddress = m;
-
-			if (K32QueryWorkingSetEx(GetCurrentProcess(), &set, sizeof(set)) && (set.VirtualAttributes.Valid & 0x1))
-			{
-				ProtectionThread();
-			}
-		};
-
-		std::function<int(void)> check_remote_session = []()
-		{
-			const auto session_metrics = GetSystemMetrics(SM_REMOTESESSION);
-			return session_metrics != 0;
-		};
-
-		std::function<int(void)> check_window_name = []()
-		{
-			if (FindWindowA("Qt5QWindowIcon", nullptr) || FindWindowA("x64dbg", nullptr) || FindWindowA("SunAwtFrame", nullptr) || FindWindowA("ID", nullptr))
-			{
-				return 1;
-			}
-			return 0;
-		};
-
-		std::function<int(void)> check_sandboxie = []()
-		{
-			if (GetModuleHandleA("SbieDll.dll"))
-			{
-				return 1;
-			}
-			return 0;
-		};
-	
-		std::function<int(void)> check_kernel_drivers = []()
-		{
-			LPVOID drivers[1024];
-			DWORD cb_needed;
-
-			if (K32EnumDeviceDrivers(drivers, sizeof(drivers), &cb_needed) && cb_needed < sizeof(drivers))
-			{
-				wchar_t szDriver[1024];
-				const wchar_t* bl_driver_list[] = { L"kprocesshacker.sys", L"SbieSvc.sys", L"HttpDebuggerSdk.sys", L"dbk64.sys",
-				L"dbk32.sys", L"SharpOD_Drv.sys" }; /* unicode anyways */
-
-				const int c_drivers = cb_needed / sizeof(drivers[0]);
-
-				for (auto i = 0; i < c_drivers; i++)
-				{
-					if (K32GetDeviceDriverBaseNameW(drivers[i], szDriver, sizeof(szDriver) / sizeof(szDriver[0])))
-					{
-						for (const auto* driver_name : bl_driver_list)
-						{
-							if (wcscmp(szDriver, driver_name) == 0) 
-							{
-								std::wstring ws(driver_name);
-								std::string str(ws.begin(), ws.end());
-								std::string output = "Detected blacklisted driver loaded (" + str + "). Please unload it from memory.";
-
-								MessageBoxA(nullptr, output.c_str(), "aevangel++", MB_ICONERROR | MB_OK);
-								return 1;
-							}
-						}
-					}
+					ProtectionThread();  // Ativa a thread de proteção
 				}
 			}
-			return 0;
 		};
 
-		std::function<int(void)> check_titan_hide = []()
+		std::function<void(void)> anti_attach = []()  // Função que impede a anexação de depuradores
 		{
-			const auto module = GetModuleHandleA("ntdll.dll");
-			const auto information = reinterpret_cast<typedefs::NtQuerySystemInformationTypedef>(GetProcAddress(module, "NtQuerySystemInformation"));
+			HMODULE h_ntdll = GetModuleHandleA("ntdll.dll");  // Obtém o manipulador do módulo ntdll.dll
+			if (!h_ntdll)  // Se não conseguiu obter o manipulador
+				return;  // Retorna
 
-			typedefs::SYSTEM_CODEINTEGRITY_INFORMATION sci;
-			sci.Length = sizeof sci;
-
-			information(typedefs::SystemCodeIntegrityInformation, &sci, sizeof sci, nullptr);
-
-			const auto ret = sci.CodeIntegrityOptions & CODEINTEGRITY_OPTION_TESTSIGN || sci.CodeIntegrityOptions & CODEINTEGRITY_OPTION_DEBUGMODE_ENABLED;
-
-			if (ret != 0)
-				return 1;
-
-			return 0;
-		};
-
-		std::function<int(void)> check_dbg_print = []()
-		{
-			__try
-			{
-				RaiseException(DBG_PRINTEXCEPTION_C, 0, 0, nullptr);
-			}
-			__except (_exception_code() == DBG_PRINTEXCEPTION_C)
-			{
-				return 1;
-			}
-
-			return 0;
-		};
-
-		std::function<int(void)> check_guard_hook = []()
-		{
-			MEMORY_BASIC_INFORMATION memory_info;
-			PEB* peb = utils::get_peb();
-
-			LIST_ENTRY head = peb->Ldr->InMemoryOrderModuleList;
-			LIST_ENTRY curr = head;
-			for (auto curr = head; curr.Flink != &peb->Ldr->InMemoryOrderModuleList; curr = *curr.Flink)
-			{
-				LDR_DATA_TABLE_ENTRY* mod = (LDR_DATA_TABLE_ENTRY*)CONTAINING_RECORD(curr.Flink, LDR_DATA_TABLE_ENTRY, InMemoryOrderLinks);
-				if (mod->FullDllName.Buffer)
-				{
-					auto* headers = reinterpret_cast<PIMAGE_NT_HEADERS>(static_cast<char*>(mod->DllBase) + static_cast<PIMAGE_DOS_HEADER>(mod->DllBase)->e_lfanew);
-					auto* sections = IMAGE_FIRST_SECTION(headers);
-
-					for (auto i = 0; i <= headers->FileHeader.NumberOfSections; i++)
-					{
-						auto* section = &sections[i];
-
-						auto virtualAddress = static_cast<PBYTE>(mod->DllBase) + section->VirtualAddress;
-
-						if (VirtualQuery(virtualAddress, &memory_info, sizeof(MEMORY_BASIC_INFORMATION)))
-						{
-							if (memory_info.State == MEM_COMMIT && (memory_info.Protect & PAGE_GUARD))
-								return 1;
-						}
-					}
-				}
-			}
-			return 0;
-		};
-	}
-}
-
-#endif /* include guard */
+			FARPROC p_dbg_break
