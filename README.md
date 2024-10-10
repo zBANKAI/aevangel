@@ -5,6 +5,7 @@
 </div>
 
 
+
 AEVANGEL++ é um "class containing" que contém métodos Anti-RE, Anti-Debug e Anti-Hook. Fácil de usar e fácil de implementar. Feito para funcionar precisamente em tempo de execução C++/CLI.
 
 
