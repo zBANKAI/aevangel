@@ -1,38 +1,36 @@
 # aevangel++
-AEVANGEL++ is a class containing Anti-RE, Anti-Debug and Anti-Hook methods. Easy to use and easy to implement. It is made to work precisely on C++/CLI runtime.
+AEVANGEL++ é um "class containing" que contém métodos Anti-RE, Anti-Debug e Anti-Hook. Fácil de usar e fácil de implementar. Feito para funcionar precisamente em tempo de execução C++/CLI.
 
 
-Estrutura
-
-1. Inclusão de headers e desativação de warnings: A primeira parte do código inclui várias bibliotecas padrão e desativa algumas advertências específicas do compilador. Isso sugere que o projeto pode usar código que potencialmente causa avisos, mas esses são intencionalmente ignorados para evitar ruídos desnecessários.
+--> Estrutura do Código
 
 
-2. Definição de macros: As macros AEVANGEL_FORCEINLINE garantem a inlining de funções, dependendo do compilador, melhorando o desempenho em certas situações.
+Inclusão de Headers e Desativação de Warnings: A primeira parte do código importa várias bibliotecas padrão e desativa algumas advertências do compilador. Isso indica que o projeto pode estar utilizando código que gera avisos, mas esses são ignorados intencionalmente para evitar ruídos desnecessários.
 
+Definição de Macros: A macro AEVANGEL_FORCEINLINE assegura a inlining de funções, dependendo do compilador, o que pode melhorar o desempenho em determinadas situações.
 
-3. Namespace AEVANGEL++:
+Namespace AEVANGEL++:
 
-typedefs: Define tipos específicos relacionados ao sistema, como NtQuerySystemInformationTypedef, e uma estrutura e enumeração para tratar de informações de integridade do código e outras informações do sistema.
+typedefs: Define tipos específicos que estão relacionados ao sistema, como NtQuerySystemInformationTypedef, além de uma estrutura e enumeração para lidar com informações de integridade do código e outras informações do sistema.
 
-utils: Implementa uma função get_peb que busca o bloco de ambiente do processo (PEB), uma estrutura crucial para acessar várias informações internas do processo.
+utils: Implementa a função get_peb, que busca o bloco de ambiente do processo (PEB), uma estrutura essencial para acessar diversas informações internas do processo.
 
 security: Contém várias funções lambda que implementam técnicas de proteção contra depuradores e sandboxing, como:
 
-ProtectionThread: Realiza um "buffer overflow" intencional e tenta sobrescrever certas funções críticas do processo.
+ProtectionThread: Executa um "buffer overflow" intencional e tenta sobrescrever funções críticas do processo.
 
 Detecção de janelas de ferramentas de análise como IDA, x64dbg e Scylla.
 
-Verificação de depuradores: Usa funções como CheckRemoteDebuggerPresent e sDebuggerPresent para detectar se o processo está sendo depurado.
+Verificação de depuradores: Utiliza funções como CheckRemoteDebuggerPresent e sDebuggerPresent para identificar se o processo está sendo depurado.
 
-Alteração de pontos de quebra (breakpoints): Modifica o comportamento de DbgBreakPoint para evitar que depuradores interrompam o fluxo do programa.
+Alteração de pontos de quebra (breakpoints): Modifica o comportamento de DbgBreakPoint para impedir que depuradores interrompam o fluxo do programa.
 
-Verificação de drivers do kernel e software de sandboxing: Verifica drivers carregados e módulos em memória, alertando se detectar ferramentas comumente usadas em análise reversa.
+Verificação de drivers do kernel e software de sandboxing: Analisa drivers carregados e módulos em memória, alertando sobre ferramentas comumente utilizadas em análise reversa.
 
-O código utiliza uma combinação de técnicas modernas de anti-debugging, como manipulação direta de memória e alterações em comportamentos padrão do sistema para evitar a inspeção por depuradores ou sandboxies.
 
-Há um uso pesado de APIs do Windows, sugerindo que o código foi desenvolvido para ser executado exclusivamente em ambientes Windows.
+O código utiliza uma combinação de técnicas modernas de anti-debugging, manipulando diretamente a memória e alterando comportamentos padrão do sistema para evitar a inspeção por depuradores ou sandboxing.
 
-O código busca ativamente manipular o processo caso detecte qualquer tentativa de depuração, indo ao ponto de tentar encerrar o processo se condições suspeitas forem encontradas.
+Além disso, há um uso intenso de APIs do Windows, o código foi desenvolvido exclusivamente para ambientes Windows. Ele busca ativamente manipular o processo se detectar qualquer tentativa de depuração, chegando a encerrar o processo caso condições suspeitas sejam encontradas.
 
 
 😐 - "Por que o nome é Aevangel?"
