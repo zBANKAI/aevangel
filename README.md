@@ -42,4 +42,4 @@ Além disso, há um uso intenso de APIs do Windows, o código foi desenvolvido e
 
 😐 - "Por que o nome é Aevangel?"
 
-É um acrônimo de um nome de uma pessoa muito importante pra mim.
+É um acrônimo de um mome de uma pessoa que eu gosto muito e é extremamente importante pra mim.
