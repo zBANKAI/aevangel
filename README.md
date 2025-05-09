@@ -38,8 +38,3 @@ Verificação de drivers do kernel e software de sandboxing: Analisa drivers car
 O código utiliza uma combinação de técnicas modernas de anti-debugging, manipulando diretamente a memória e alterando comportamentos padrão do sistema para evitar a inspeção por depuradores ou sandboxing.
 
 Além disso, há um uso intenso de APIs do Windows, o código foi desenvolvido exclusivamente para ambientes Windows. Ele busca ativamente manipular o processo se detectar qualquer tentativa de depuração, chegando a encerrar o processo caso condições suspeitas sejam encontradas.
-
-
-😐 - "Por que o nome é Aevangel?"
-
-É um acrônimo de um nome de uma pessoa que eu gosto muito e é extremamente importante pra mim.
